@@ -7,15 +7,15 @@ class Category(models.Model):
     description = models.TextField(blank=True, verbose_name='описание категории')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
     def get_absolute_url(self):
         return reverse('category', kwargs={'category_id': self.pk})
 
     def __str__(self):
         return self.title
-
-    class Meta:
-        verbose_name = 'Категория'
-        verbose_name_plural = 'Категории'
 
 
 class Product(models.Model):
