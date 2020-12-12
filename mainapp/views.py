@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 from mainapp.models import Category, Product
 
 
@@ -20,4 +20,4 @@ def products(request):
 
 # TODO - функция для обработки клика по категории
 def products_by_category(request):
-    pass
+    return HttpResponse('ok')
