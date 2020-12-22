@@ -24,20 +24,6 @@
                             </div>
                         </div>
                     </li>
-
-                    {#                        <li class="list-group-item bg-light">#}
-                    {##}
-                    {#                            <span class="text-muted">{{ basket.quantity }} шт.</span>#}
-                    {#                            <span class="text-muted">{{ basket.get_total_sum_by_product }} руб.</span>#}
-                    {#                            <span class="text-muted">#}
-                    {#                            <a href="{% url 'basketapp:basket_add' basket.product.id %}">#}
-                    {#                                <i class="fas fa-cart-plus"></i>#}
-                    {#                            </a>#}
-                    {#                            <a href="{% url 'basketapp:basket_remove' basket.id %}">#}
-                    {#                                <i class="fas fa-trash"></i>#}
-                    {#                            </a>#}
-                    {#                        </span>#}
-                    {#                        </li>#}
                 </ul>
             </div>
         {% endfor %}
