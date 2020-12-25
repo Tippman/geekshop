@@ -1,9 +1,19 @@
 from django.shortcuts import render, HttpResponseRedirect, reverse
 from django.contrib.auth.decorators import user_passes_test
+from django.urls import reverse_lazy
+from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.utils.decorators import method_decorator
 from authapp.models import User
 from mainapp.models import Category, Product
 from adminapp.forms import UserAdminRegisterForm, UserAdminProfileForm, CategoryAdminCreationForm, \
     ProductAdminCreationForm
+
+
+class AccessClass:
+    @method_decorator(user_passes_test(lambda user: user.is_superuser or user.is_staff))
+    def dispatch(self, request, *args, **kwargs):
+        return super(AccessClass, self).dispatch(request, *args, **kwargs)
 
 
 @user_passes_test(lambda user: user.is_superuser or user.is_staff)
@@ -11,120 +21,85 @@ def index(request):
     return render(request, 'adminapp/index.html')
 
 
-@user_passes_test(lambda user: user.is_superuser or user.is_staff)
-def admin_users(request):
-    context = {
-        'users': User.objects.all(),
-    }
-    return render(request, 'adminapp/admin-users-read.html', context)
+class AdminUserList(AccessClass, ListView):
+    model = User
+    template_name = 'adminapp/admin-users-read.html'
+    context_object_name = 'users'
 
 
-@user_passes_test(lambda user: user.is_superuser or user.is_staff)
-def admin_users_create(request):
-    if request.method == 'POST':
-        form = UserAdminRegisterForm(data=request.POST, files=request.FILES)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('admin_staff:admin_users'))
-    else:
-        form = UserAdminRegisterForm()
-
-    context = {'title': 'регистрация', 'form': form}
-    return render(request, 'adminapp/admin-users-create.html', context)
+class AdminUserCreate(AccessClass, CreateView):
+    model = User
+    template_name = 'adminapp/admin-users-create.html'
+    success_url = reverse_lazy('admin_staff:admin_users')
+    form_class = UserAdminRegisterForm
 
 
-@user_passes_test(lambda user: user.is_superuser or user.is_staff)
-def admin_users_edit(request, user_id):
-    user = User.objects.get(id=user_id)
-    if request.method == 'POST':
-        form = UserAdminProfileForm(data=request.POST, files=request.FILES, instance=user)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('admin_staff:admin_users'))
-    else:
-        form = UserAdminProfileForm(instance=user)
-    context = {'form': form, 'user': user}
-    return render(request, 'adminapp/admin-users-update-delete.html', context)
+class AdminUserUpdate(AccessClass, UpdateView):
+    model = User
+    template_name = 'adminapp/admin-users-update-delete.html'
+    success_url = reverse_lazy('admin_staff:admin_users')
+    form_class = UserAdminProfileForm
 
 
-@user_passes_test(lambda user: user.is_superuser or user.is_staff)
-def admin_users_remove(request, user_id):
-    user = User.objects.get(id=user_id)
-    user.is_active = False
-    user.save()
-    return HttpResponseRedirect(reverse('admin_staff:admin_users'))
+class AdminUserDelete(AccessClass, DeleteView):
+    model = User
+    template_name = 'adminapp/admin-users-update-delete.html'
+    success_url = reverse_lazy('admin_staff:admin_users')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.is_active = False
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
 
 
-@user_passes_test(lambda user: user.is_superuser or user.is_staff)
-def admin_users_recover(request, user_id):
-    user = User.objects.get(id=user_id)
-    user.is_active = True
-    user.save()
-    return HttpResponseRedirect(reverse('admin_staff:admin_users'))
+class AdminUserRecover(AccessClass, UpdateView):
+    model = User
+    template_name = 'adminapp/admin-users-update-delete.html'
+    success_url = reverse_lazy('admin_staff:admin_users')
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.is_active = True
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
 
 
-@user_passes_test(lambda user: user.is_superuser or user.is_staff)
-def admin_categories(request):
-    context = {'categories': Category.objects.all()}
-    return render(request, 'adminapp/admin-categories-read.html', context)
+class AdminCategoryList(AccessClass, ListView):
+    model = Category
+    template_name = 'adminapp/admin-categories-read.html'
+    context_object_name = 'categories'
 
 
-@user_passes_test(lambda user: user.is_superuser or user.is_staff)
-def admin_categories_create(request):
-    if request.method == 'POST':
-        form = CategoryAdminCreationForm(data=request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('admin_staff:admin_categories'))
-    else:
-        form = CategoryAdminCreationForm()
-
-    context = {'form': form}
-    return render(request, 'adminapp/admin-categories-create.html', context)
+class AdminCategoryCreate(AccessClass, CreateView):
+    model = Category
+    template_name = 'adminapp/admin-categories-create.html'
+    form_class = CategoryAdminCreationForm
+    success_url = reverse_lazy('admin_staff:admin_categories')
 
 
-@user_passes_test(lambda user: user.is_superuser or user.is_staff)
-def admin_categories_update(request, category_id):
-    category = Category.objects.get(id=category_id)
-    if request.method == 'POST':
-        form = CategoryAdminCreationForm(data=request.POST, instance=category)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('admin_staff:admin_categories'))
-    else:
-        form = CategoryAdminCreationForm(instance=category)
-    context = {'form': form, 'category': category}
-    return render(request, 'adminapp/admin-category-update-delete.html', context)
+class AdminCategoryUpdate(AccessClass, UpdateView):
+    model = Category
+    template_name = 'adminapp/admin-category-update-delete.html'
+    success_url = reverse_lazy('admin_staff:admin_categories')
+    form_class = CategoryAdminCreationForm
 
 
-@user_passes_test(lambda user: user.is_superuser or user.is_staff)
-def admin_products(request):
-    context = {'products': Product.objects.all()}
-    return render(request, 'adminapp/admin-products-read.html', context)
+class AdminProductList(AccessClass, ListView):
+    model = Product
+    template_name = 'adminapp/admin-products-read.html'
+    context_object_name = 'products'
 
 
-@user_passes_test(lambda user: user.is_superuser or user.is_staff)
-def admin_products_create(request):
-    if request.method == 'POST':
-        form = ProductAdminCreationForm(data=request.POST, files=request.FILES)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('admin_staff:admin_products'))
-    else:
-        form = ProductAdminCreationForm()
-    context = {'form': form}
-    return render(request, 'adminapp/admin-products-create.html', context)
+class AdminProductCreate(AccessClass, CreateView):
+    model = Product
+    template_name = 'adminapp/admin-products-create.html'
+    form_class = ProductAdminCreationForm
+    success_url = reverse_lazy('admin_staff:admin_products')
 
 
-@user_passes_test(lambda user: user.is_superuser or user.is_staff)
-def admin_product_update(request, product_id):
-    product = Product.objects.get(id=product_id)
-    if request.method == 'POST':
-        form = ProductAdminCreationForm(data=request.POST, files=request.FILES, instance=product)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('admin_staff:admin_products'))
-    else:
-        form = ProductAdminCreationForm(instance=product)
-    context = {'form': form, 'product': product}
-    return render(request, 'adminapp/admin-product-update-delete.html', context)
+class AdminProductUpdate(AccessClass, UpdateView):
+    model = Product
+    template_name = 'adminapp/admin-product-update-delete.html'
+    form_class = ProductAdminCreationForm
+    success_url = reverse_lazy('admin_staff:admin_products')

@@ -41,22 +41,37 @@
             </div>
             <div class="form-row">
                 <div class="col-lg-6" style="margin-top: 33px;">
-                    <a href="{% url 'admin_staff:admin_users_edit' user.id %}">
-                        <input class="btn btn-info btn-block" type="submit" value="Сохранить">
-                    </a>
-                </div>
-                <div class="col-lg-6" style="margin-top: 33px;">
-                    {% if user.is_active %}
-                        <a href="{% url 'admin_staff:admin_users_remove' user.id %}">
-                            <input class="btn btn-danger btn-block" type="button" value="Удалить">
-                        </a>
-                    {% else %}
-                        <a href="{% url 'admin_staff:admin_users_recover' user.id %}">
-                            <input class="btn btn-success btn-block" type="button" value="Восстановить">
-                        </a>
-                    {% endif %}
+                    <input class="btn btn-info btn-block" type="submit" value="Сохранить">
                 </div>
             </div>
         </form>
+        <div class="row">
+            <div class="col-lg-6" style="margin-top: 33px;">
+                <form action="
+                        {% if user.is_active %}{% url 'adminapp:admin_users_remove' user.id %}
+                        {% else %}{% url 'admin_staff:admin_users_recover' user.id %}
+                        {% endif %}" method="post">
+                    {% csrf_token %}
+                    {% if user.is_active %}
+                        <input class="btn btn-danger btn-block" type="submit" value="Удалить">
+                    {% else %}
+                        <input class="btn btn-success btn-block" type="submit" value="Восстановить">
+
+                    {% endif %}
+                </form>
+                {##}
+                {#                {% if user.is_active %}#}
+                {#                    <form action="{% url 'adminapp:admin_users_remove' user.id %}" method="post">#}
+                {#                        {% csrf_token %}#}
+                {#                    </form>#}
+                {#                {% else %}#}
+                {#                    <form action="{% url 'admin_staff:admin_users_recover' user.id %}" method="post">#}
+                {##}
+                {#                    </form>#}
+                {#                    <a href="{% url 'admin_staff:admin_users_recover' user.id %}">#}
+                {#                    </a>#}
+                {#                {% endif %}#}
+            </div>
+        </div>
     </div>
 {% endblock %}

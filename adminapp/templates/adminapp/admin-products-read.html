@@ -32,7 +32,7 @@
                     {% for product in products %}
                         <tr>
                             <td>{{ product.category }}</td>
-                            <td><a href="{% url 'adminapp:admin_product_update' product.id %}">{{ product.title }}</a></td>
+                            <td><a href="{% url 'admin_staff:admin_product_update' product.id %}">{{ product.title }}</a></td>
                             <td>{{ product.price }}</td>
                             <td>{{ product.quantity }}</td>
                             <td class="text-center">
