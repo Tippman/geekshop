@@ -8,6 +8,7 @@ urlpatterns = [
     path('', include('mainapp.urls')),
     path('auth/', include('authapp.urls')),
     path('baskets/', include('basketapp.urls', namespace='baskets')),
+    path('admin-staff/', include('adminapp.urls', namespace='admin_staff')),
 ]
 
 if settings.DEBUG:

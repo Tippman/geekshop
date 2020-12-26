@@ -6,6 +6,7 @@ class Category(models.Model):
     title = models.CharField(max_length=50, unique=True, verbose_name='Наименование категории')
     description = models.TextField(blank=True, verbose_name='описание категории')
     created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(verbose_name='Статус', default=True)
 
     class Meta:
         verbose_name = 'Категория'
@@ -28,6 +29,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to='mainapp/products_images')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True, verbose_name='Статус товара')
 
     def __str__(self):
         return f'{self.title} ({self.category.title})'
