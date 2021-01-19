@@ -1,8 +1,38 @@
+from django.conf import settings
+from django.core.mail import send_mail
 from django.shortcuts import render, HttpResponseRedirect
 from authapp.forms import UserLoginForm, UserRegisterForm, UserProfileForm
 from django.contrib import auth, messages
 from django.urls import reverse
+
+from authapp.models import User
 from basketapp.models import Basket
+
+
+def send_veryfy_email(user):
+    verify_link = reverse('authapp:verify', args=[user.email, user.activation_key])
+
+    subject = f'Подтверждение учетной записи {user.username}'
+    message = f'Для подтверждения перейдите по ссылке: {settings.DOMAIN}{verify_link}'
+
+    return send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+
+
+def verify(request, email, activation_key):
+    try:
+        user = User.objects.get(email=email)
+        if user.activation_key == activation_key and not user.is_activation_key_expired():
+            user.is_active = True
+            user.activation_key = None
+            auth.login(request, user)
+            user.save()
+            return render(request, 'authapp/verification.html')
+        else:
+            print(f'error activation user: {user}')
+            return render(request, 'authapp/verification.html')
+    except Exception as ex:
+        print(ex)
+        return HttpResponseRedirect(reverse('mainapp:home'))
 
 
 def login(request):
@@ -31,8 +61,9 @@ def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(data=request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Вы успешно зарегистрировались!')
+            user = form.save()
+            send_veryfy_email(user)
+            messages.success(request, 'На ваш почтовый адрес отправлена ссылка для активации аккаунта')
             return HttpResponseRedirect(reverse('authapp:login'))
     else:
         form = UserRegisterForm()

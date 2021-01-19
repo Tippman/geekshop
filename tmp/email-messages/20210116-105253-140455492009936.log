@@ -1,0 +1,13 @@
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: 
+ =?utf-8?b?0J/QvtC00YLQstC10YDQttC00LXQvdC40LUg0YPRh9C10YLQvdC+0Lkg0LfQsNC/?=
+ =?utf-8?b?0LjRgdC4IGRqYW5najY=?=
+From: django@geekshop.local
+To: d6@dj.com
+Date: Sat, 16 Jan 2021 10:52:53 -0000
+Message-ID: <161079437399.5386.7537937661687302272@iMac.local>
+
+Для подтверждения перейдите по ссылке: http://localhost:9000/auth/verify/d6@dj.com/4b4b19f4f68835d3f02558e01e2dd40ccd5ba0f9/
+-------------------------------------------------------------------------------
