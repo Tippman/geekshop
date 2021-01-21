@@ -1,0 +1,34 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/orders.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="content col-lg-12">
+        {% include 'orderapp/_inc/inc_order_summary.html' %}
+        <div class="row">
+            {% for item in object.orderitems.select_related %}
+                <div class="card col-md-2 m-2">
+                    <img class="card-img-top" src="{{ item.product.image.url }}"
+                         alt="{{ item.product.short_desc }}">
+                    <span class="category_name">
+                   {{ item.product.category.title }}
+               </span>
+                    <span class="product_name">{{ item.product.title }}</span>
+                    <span class="product_price">
+                   {{ item.product.price }}&nbspруб
+               </span>
+                    <span class="product_quantitiy">
+                   x {{ item.quantity }} шт.
+               </span>
+                    <span class="product_cost">
+                    = {{ item.get_product_cost }}&nbspруб
+               </span>
+                </div>
+            {% endfor %}
+        </div>
+        {% include 'orderapp/_inc/inc_order_actions.html' %}
+    </div>
+{% endblock %}

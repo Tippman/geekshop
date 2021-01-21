@@ -103,3 +103,5 @@ class AdminProductUpdate(AccessClass, UpdateView):
     template_name = 'adminapp/admin-product-update-delete.html'
     form_class = ProductAdminCreationForm
     success_url = reverse_lazy('admin_staff:admin_products')
+
+# TODO добавить обработку заказов в админке
