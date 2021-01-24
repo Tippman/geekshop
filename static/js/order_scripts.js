@@ -53,9 +53,11 @@ window.onload = function () {
             },
             success: (data) => {
                 $(`span.orderitems-${orderitem_num}-price`).html(data);
+                price_arr[orderitem_num] = parseFloat($('span.orderitems-' + orderitem_num + '-price').text().replace(',', '.').replace(/\s*/g, ''));
             },
         });
         event.preventDefault();
+
     });
 
 
