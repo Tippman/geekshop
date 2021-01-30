@@ -1,11 +1,12 @@
 from django.db import transaction
 from django.forms import inlineformset_factory
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 
 from basketapp.models import Basket
+from mainapp.models import Product
 from orderapp.forms import OrderItemForm
 from orderapp.models import Order, OrderItem
 
@@ -36,7 +37,8 @@ class OrderCreate(CreateView):
                 for num, form in enumerate(formset.forms):
                     form.initial['product'] = basket_items[num].product
                     form.initial['quantity'] = basket_items[num].quantity
-                basket_items.delete()
+                    form.initial['price'] = basket_items[num].product.price
+                # basket_items.delete()
             else:
                 formset = OrderFormSet()
 
@@ -49,6 +51,7 @@ class OrderCreate(CreateView):
         orderitems = context['orderitems']
 
         with transaction.atomic():
+            # Basket.get_items(self.request.user).delete()
             form.instance.user = self.request.user
             self.object = form.save()
             if orderitems.is_valid():
@@ -71,11 +74,13 @@ class OrderUpdate(UpdateView):
         OrderFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemForm, extra=1)
 
         if self.request.POST:
-            formset = OrderFormSet(self.request.POST, instance=self.object)
+            data['orderitems'] = OrderFormSet(self.request.POST, instance=self.object)
         else:
             formset = OrderFormSet(instance=self.object)
-
-        data['orderitems'] = formset
+            for form in formset.forms:
+                if form.instance.pk:
+                    form.initial['price'] = form.instance.product.price
+            data['orderitems'] = formset
 
         return data
 
@@ -91,7 +96,6 @@ class OrderUpdate(UpdateView):
 
         if self.object.get_total_cost == 0:
             self.object.delete()
-        #     TODO 2.02 в лекции задание
 
         return super().form_valid(form)
 
@@ -111,3 +115,10 @@ def order_forming_complete(request, pk):
     order.save()
 
     return HttpResponseRedirect(reverse('order:orders'))
+
+
+def get_item_price(request):
+    product_price = Product.objects.get(pk=request.GET.get('product_id')).price
+    price_arr = str(product_price).split('.')
+    locale_product_price = ','.join([f'{price_arr[0][:-3]} {price_arr[0][-3:]}', price_arr[1]])
+    return HttpResponse(locale_product_price)
