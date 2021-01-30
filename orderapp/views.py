@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.forms import inlineformset_factory
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
@@ -118,7 +118,8 @@ def order_forming_complete(request, pk):
 
 
 def get_item_price(request):
-    product_price = Product.objects.get(pk=request.GET.get('product_id')).price
-    price_arr = str(product_price).split('.')
-    locale_product_price = ','.join([f'{price_arr[0][:-3]} {price_arr[0][-3:]}', price_arr[1]])
-    return HttpResponse(locale_product_price)
+    if request.is_ajax():
+        product_price = Product.objects.get(pk=request.GET.get('product_id')).price
+        price_arr = str(product_price).split('.')
+        locale_product_price = ','.join([f'{price_arr[0][:-3]} {price_arr[0][-3:]}', price_arr[1]])
+        return JsonResponse({'price': locale_product_price})

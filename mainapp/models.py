@@ -34,6 +34,10 @@ class Product(models.Model):
     def __str__(self):
         return f'{self.title} ({self.category.title})'
 
+    @staticmethod
+    def get_items():
+        return Product.objects.filter(is_active=True).order_by('category', 'title')
+
     class Meta:
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
