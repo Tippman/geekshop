@@ -39,7 +39,7 @@ def basket_edit(request, basket_id, quantity):
             basket.save()
         else:
             basket.delete()
-        baskets = Basket.objects.filter(user=request.user)
+        baskets = Basket.objects.filter(user=request.user).select_related('product')
         context = {
             'baskets': baskets,
         }

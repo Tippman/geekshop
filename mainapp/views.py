@@ -25,7 +25,8 @@ class Products(ListView):
         return context
 
     def get_queryset(self):
-        return Product.objects.filter(is_active=True, category__is_active=True)
+        return Product.objects.filter(is_active=True, category__is_active=True).select_related('category')
+        # return Product.objects.filter(is_active=True, category__is_active=True)
 
 
 class ProductsByCategory(ListView):
@@ -43,4 +44,7 @@ class ProductsByCategory(ListView):
         return context
 
     def get_queryset(self):
-        return Product.objects.filter(category_id=self.kwargs['category_id'], is_active=True, category__is_active=True)
+        return Product.objects.filter(category_id=self.kwargs['category_id'], is_active=True,
+                                      category__is_active=True).select_related('category')
+        # return Product.objects.filter(category_id=self.kwargs['category_id'], is_active=True,
+        #                               category__is_active=True)

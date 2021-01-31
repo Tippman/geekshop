@@ -26,14 +26,14 @@ class Basket(models.Model):
 
     @staticmethod
     def get_items(user):
-        return Basket.objects.filter(user=user).order_by('product__category')
+        return Basket.objects.filter(user=user).order_by('product__category').select_related()
 
     @staticmethod
     def get_item(pk):
         return Basket.objects.filter(pk=pk).first()
 
     def get_user_baskets(self):
-        return Basket.objects.filter(user=self.user)
+        return Basket.objects.filter(user=self.user).select_related()
 
     def get_total_sum_by_product(self):
         return self.product.price * self.quantity
