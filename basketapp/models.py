@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils.functional import cached_property
+
 from authapp.models import User
 from mainapp.models import Product
 
@@ -24,6 +26,10 @@ class Basket(models.Model):
     def __str__(self):
         return f'Корзина для пользователя {self.user.username} | Продукт {self.product.title}'
 
+    @cached_property
+    def get_items_cached(self):
+        return self.user.basket.select_related()
+
     @staticmethod
     def get_items(user):
         return Basket.objects.filter(user=user).order_by('product__category').select_related()
@@ -39,10 +45,10 @@ class Basket(models.Model):
         return self.product.price * self.quantity
 
     def get_total_sum(self):
-        return sum(basket.get_total_sum_by_product() for basket in self.get_user_baskets())
+        return sum(basket.get_total_sum_by_product() for basket in self.get_items_cached)
 
     def get_total_quantity(self):
-        return sum(basket.quantity for basket in self.get_user_baskets())
+        return sum(basket.quantity for basket in self.get_items_cached)
 
     # def delete(self):
     #     self.product.quantity += self.quantity
