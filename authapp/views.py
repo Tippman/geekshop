@@ -87,6 +87,6 @@ def profile(request):
         'title': f'Профиль :: {request.user.username}',
         'form': form,
         'profile_form': profile_form,
-        'baskets': Basket.objects.filter(user=request.user),
+        'baskets': Basket.objects.filter(user=request.user).select_related(),
     }
     return render(request, 'authapp/profile.html', context)
