@@ -33,7 +33,8 @@ class Products(ListView):
         context = super().get_context_data(**kwargs)
         context.update({
             'title': 'Каталог',
-            'categories': Category.objects.filter(is_active=True),
+            # 'categories': Category.objects.filter(is_active=True),
+            'categories': get_links_menu(),
         })
         return context
 
@@ -52,7 +53,8 @@ class ProductsByCategory(ListView):
         context = super().get_context_data(**kwargs)
         context.update({
             'title': Category.objects.get(pk=self.kwargs['category_id']),
-            'categories': Category.objects.filter(is_active=True),
+            # 'categories': Category.objects.filter(is_active=True),
+            'categories': get_links_menu(),
         })
         return context
 
