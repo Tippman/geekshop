@@ -17,6 +17,18 @@ def get_links_category():
         return Category.objects.filter(is_active=True)
 
 
+def get_products_ordered_by_price():
+    if settings.LOW_CACHE:
+        key = 'products_ordered_by_price'
+        products = cache.get(key)
+        if products is None:
+            products = Product.objects.filter(is_active=True, category__is_active=True).order_by('price')
+            cache.set(key, products)
+        return products
+    else:
+        return Product.objects.filter(is_active=True, category__is_active=True).order_by('price')
+
+
 def get_products_by_category_ordered_by_price(pk):
     if settings.LOW_CACHE:
         key = f'products_by_category_ordered_by_price_{pk}'
@@ -54,7 +66,8 @@ class Products(ListView):
         return context
 
     def get_queryset(self):
-        return Product.objects.filter(is_active=True, category__is_active=True).select_related('category')
+        return get_products_ordered_by_price()
+        # return Product.objects.filter(is_active=True, category__is_active=True).select_related('category')
         # return Product.objects.filter(is_active=True, category__is_active=True)
 
 
