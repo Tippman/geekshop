@@ -1,7 +1,20 @@
 from django.shortcuts import render
 from mainapp.models import Category, Product
 from django.views.generic import ListView
+from django.conf import settings
+from django.core.cache import cache
 
+
+def get_links_menu():
+    if settings.LOW_CACHE:
+        key = 'links_menu'
+        links_menu = cache.get(key)
+        if links_menu is None:
+            links_menu = Category.objects.filter(is_active=True)
+            cache.set(key, links_menu)
+        return links_menu
+    else:
+        return Category.objects.filter(is_active=True)
 
 def index(request):
     context = {
