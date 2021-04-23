@@ -11,8 +11,7 @@
         <div class="row">
             {% for item in object.orderitems.select_related %}
                 <div class="card col-md-2 m-2">
-                    <img class="card-img-top" src="{{ item.product.image.url }}"
-                         alt="{{ item.product.short_desc }}">
+                    <img class="card-img-top" src="{% if item.product.image %}{{ item.product.image.url }}"{% endif %} alt="{{ item.product.short_desc }}">
                     <span class="category_name">
                    {{ item.product.category.title }}
                </span>

@@ -1,5 +1,6 @@
 {% extends 'mainapp/base.html' %}
 {% load static %}
+{% load cache %}
 
 {% block css %}
     <link rel="stylesheet" href="{% static 'css/orders.css' %}">
@@ -43,7 +44,13 @@
                                         </span> руб.
                                             {% endif %}
                                         {% else %}
-                                            {{ field }}
+                                            {% if field.name == 'product' %}
+                                                {% cache 3600 orderitemform_rroduct field.value %}
+                                                    {{ field }}
+                                                {% endcache %}
+                                            {% else %}
+                                                {{ field }}
+                                            {% endif %}
                                         {% endif %}
                                     </td>
                                 {% endfor %}
